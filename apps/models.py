@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractUser
 
 
 class MyUser(AbstractUser):
-    wallet = models.BigIntegerField(default=10000)
+    wallet = models.IntegerField(default=10000)
 
     def __str__(self):
         return self.username
