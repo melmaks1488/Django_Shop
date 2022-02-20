@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% load crispy_forms_tags %}
+
+
+{% block content %}
+    <div class="alert alert-success" role="alert">
+        <div class="d-flex">
+            <div class="p-2">
+                <h4 class="alert-heading">Корзина</h4>
+            </div>
+            <div class="ml-auto p-2">
+                <form method="get" action="{% url 'base' %}">
+                    <button type="submit" class="btn btn-success" value="Base page">Вернуться на главную страницу
+                    </button>
+                </form>
+            </div>
+        </div>
+        <p>Купленные товары</p>
+        <hr>
+        <p class="mb-0">Товар можно вернуть в течении трех минут</p>
+    </div>
+    <div style="background-color: mediumseagreen">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-danger" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+    </div>
+    {% for purchase in object_list %}
+        <form method="post" action="{% url 'purchase_return' %}" enctype="multipart/form-data">
+            <div style="color: whitesmoke">
+                <div class="d-flex">
+                    <div class="p-2">
+                        <img src="/media/{{ product.image }}" width="150" height="150" alt="{{ product.name }}">
+                    </div>
+                    <div class="p-2">
+                        <h2 style="color: #e4b101">{{ purchase.product.name }}</h2>
+                        <p>Стоимость товара: {{ purchase.product.price }}</p>
+                        <p>Количество купленного товара: {{ purchase.quantity }}</p>
+                        <p>Время покупки товара: {{ purchase.time_of_buy }}</p>
+                        <p>{{ purchase_form }}</p>
+                    </div>
+                    <div class="ml-auto p-2">
+                        {% csrf_token %}
+                        <input type="hidden" name="purchase_id" value="{{ purchase.id }}">
+                        <button type="submit" class="btn btn-warning" value="Return order">Возврат товара</button>
+                    </div>
+                </div>
+                <hr style="background-color: #e4b101">
+            </div>
+        </form>
+    {% endfor %}
+{% endblock %}

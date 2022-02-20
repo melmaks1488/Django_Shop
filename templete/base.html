@@ -2,12 +2,177 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>My Django Shop</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet">
 </head>
-<body>
-<div style="background-color: aqua">
+  <body style="background-color: #000000 ">
+<div>
     {% block content %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-danger" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        {% if request.user.is_authenticated and request.user.is_superuser == False %}
+            <div class="alert alert-warning" role="alert">
+                <div class="d-flex">
+                    <div class="p-2">Пользователь, {{ request.user }}!</div>
+                    <div class="ml-auto p-2">
+                        <form method="get" action="{% url 'logout' %}">
+                            <button type="submit" class="btn btn-outline-danger" value="Logout">Выход</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex" >
+                <div class="p-2">
+                    <h3 style="color: white">У тебя есть: {{ request.user.wallet }} UAH </h3>
+                </div>
+                <div class="ml-auto p-2">
+                    <form method="get" action="{% url 'purchase' %}">
+                        <button type="submit" class="btn btn-warning" value="My purchase">Покупки</button>
+                    </form>
+                </div>
+            </div>
+            </div>
+            <hr style="background-color: #e4b101">
+
+
+
+            {% for product in object_list %}
+                <form method="post" action="{% url 'create_purchase' %}">
+                    <div style="color: white">
+                        <div class="d-flex">
+                            <div class="p-2">
+                                <img src="/media/{{ product.image }}" width="150" height="150" alt="{{ product.name }}">
+                            </div>
+                            <div class="p-2">
+                                <h2 style="color: #e4b101">{{ product.name }}</h2>
+                                <p>Описание: {{ product.description }}</p>
+                                <p>Цена: {{ product.price }}</p>
+                                <p>Количество на складе: {{ product.quantity_in_stock }}</p>
+                                <p>{{ purchase_form }}</p>
+                            </div>
+                            <div class="ml-auto p-2">
+                                {% csrf_token %}
+                                <input type="hidden" name="product_id" value="{{ product.id }}">
+                                <button type="submit" class="btn btn-success" value="buy"> Купить</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <hr style="background-color: #e4b101">
+            {% endfor %}
+        {% endif %}
+
+        {% if request.user.is_superuser %}
+            <div class="alert alert-warning" role="alert">
+                <div class="d-flex">
+                    <div class="p-2">Привет, {{ request.user }}!</div>
+                    <div class="ml-auto p-2">
+                        <form method="get" action="{% url 'logout' %}">
+                            <button type="submit" class="btn btn-outline-danger" value="Logout">Выйти</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert alert-secondary" role="alert">
+                <div class="d-flex">
+                    <div class="p-2">
+                        <form method="get" action="{% url 'product_create' %}">
+                            <button type="submit" class="btn btn-success" value="Add"> Добавить товар</button>
+                        </form>
+                    </div>
+                    <div class="ml-auto p-2">
+                        <form method="get" action="{% url 'returns' %}">
+                            <button type="submit" class="btn btn-warning" value="Return view"> Просмотр возвратов</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+
+            {% for product in object_list %}
+                <div style="color: whitesmoke">
+                    <div class="d-flex">
+                        <div class="p-2">
+                            <img src="/media/{{ product.image }}" width="150" height="150" alt="{{ product.name }}">
+                        </div>
+                        <div class="p-2">
+                            <h2 style="color: #e4b101">{{ product.name }}</h2>
+                            <p>Описание : {{ product.description }}</p>
+                            <p>Стоимость : {{ product.price }}</p>
+                            <p>Наличие на складе: {{ product.quantity_in_stock }}</p>
+                            <p>{{ purchase_form }}</p>
+                        </div>
+                        <div class="ml-auto p-2">
+                            <form method="get" action="{% url 'update_product' product.pk %}">
+                                <button type="submit" class="btn btn-warning" value="Update">Изменить</button>
+                            </form>
+                        </div>
+                    </div>
+                    <hr style="background-color: #e4b101">
+                </div>
+            {% endfor %}
+        {% endif %}
+        {% if request.user.is_anonymous %}
+            <div class="alert alert-success" role="alert">
+                <div class="d-flex">
+                    <div class="p-2">
+                        <h5 class="text-center"> Уже есть аккаунт? </h5>
+                    </div>
+                    <div class="ml-auto p-2">
+                        <form method="get" action="{% url 'login' %}">
+                            <button type="submit" class="btn btn-success" value="Login"> Войти</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="alert alert-warning" role="alert">
+                <div class="d-flex">
+                    <div class="p-2">
+                        <h5 class="text-center">Еще не зарегистрировался?</h5>
+                    </div>
+                    <div class="ml-auto p-2">
+                        <form method="get" action="{% url 'registration' %}">
+                            <button type="submit" class="btn btn-warning" value="Registration"> Регистрация</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            {% for product in object_list %}
+                <div style="color: white">
+                    <div class="d-flex">
+                        <div class="p-2">
+                            <img src="/media/{{ product.image }}" width="150" height="150" alt="{{ product.name }}">
+                        </div>
+                        <div class="p-2">
+                            <h2 style="color: #e4b101">{{ product.name }}</h2>
+                            <p>О товаре: {{ product.description }}</p>
+                            <p>Стоимость: {{ product.price }}</p>
+                        </div>
+                    </div>
+                    <hr style="background-color: #e4b101">
+                </div>
+            {% endfor %}
+        {% endif %}
     {% endblock %}
-</div>
+
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
 </body>
 </html>

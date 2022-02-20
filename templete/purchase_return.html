@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="d-flex">
+        <div class="ml-auto p-2">
+            <form method="get" action="{% url 'base' %}">
+                <button type="submit" class="btn btn-success" value="Base page">Вернуться на главную страницу
+                </button>
+            </form>
+        </div>
+    </div>
+
+    {% for return in object_list %}
+        <div class="alert alert-warning" role="alert">
+
+            <p>Товар: {{ return.purchase.product.name }}</p>
+            <p>Пользователь который вернул: {{ return.purchase.user.username }}</p>
+            <p>Количество товара: {{ return.purchase.quantity_of_products }}</p>
+            <form method="post" action="{% url 'delete_purchase' return.purchase.pk %}">
+                <input type="hidden" name="product_pk" value="{{ return.purchase.product.pk }}">
+                <input type="hidden" name="product_price" value="{{ return.purchase.product.price }}">
+                <input type="hidden" name="purchase_quantity" value="{{ return.purchase.quantity_of_products }}">
+                <input type="hidden" name="purchase_user" value="{{ return.purchase.user.pk }}">
+                <button type="submit" class="btn btn-success" value="Approve"> Подтвердить возврат</button>
+                {% csrf_token %}
+            </form>
+            <form method="post" action="{% url 'delete_return' return.pk %}">
+                <button type="submit" class="btn btn-danger" value="Disapprove"> Отказать в возврате</button>
+                {% csrf_token %}
+            </form>
+        </div>
+    {% endfor %}
+    {#    {{ return_form }}#}
+
+
+{% endblock %}
